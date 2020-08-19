@@ -26,6 +26,40 @@ struct MoviePlayerView: UIViewRepresentable {
     }
 }
 
+struct SeekBar: UIViewRepresentable {
+    let player: AVPlayer
+    let slider: UISlider
+    
+    func makeUIView(context: Context) -> UIView {
+        return Slider(player: player, slider: slider)
+    }
+    
+    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<SeekBar>) {
+    }
+}
+
+class Slider: UIView {
+    private let player: AVPlayer
+    private let slider: UISlider
+    
+    init(player: AVPlayer, slider: UISlider){
+        self.player = player
+        self.slider = slider
+        super.init(frame: .zero)
+        self.addSubview(slider)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        // 画面幅いっぱいに広がる
+        slider.frame = bounds
+    }
+}
+
 class MoviewPlayerUIView: UIView {
     private let player: AVPlayer
     private let playerLayer = AVPlayerLayer()
@@ -41,7 +75,7 @@ class MoviewPlayerUIView: UIView {
         
         super.init(frame: .zero)
         
-        // TODO:はじめから再生しておきたい場合はコメントアウト外す
+        // はじめから再生しておきたい場合はコメントアウト外す
 //        player.play()
 
         playerLayer.player = player
@@ -136,6 +170,24 @@ struct MoviePlayerControlsView : View {
         })
     }
     
+    //TODO:ここから
+//    func addPeriodicTimeObserver() {
+//        // Notify every half second
+//        let timeScale = CMTimeScale(NSEC_PER_SEC)
+//        let time = CMTime(seconds: 0.5, preferredTimescale: timeScale)
+//
+//        timeObserverToken = player.addPeriodicTimeObserver(forInterval: time,
+//                                                           queue: .main)
+//        { [weak self] time in
+//            // update player transport UI
+//            DispatchQueue.main.async {
+//                print("update timer:\(CMTimeGetSeconds(time))")
+//                // sliderを更新
+//                self?.updateSlider()
+//            }
+//        }
+//    }
+    
 //    private func sliderEditingChanged(editingStarted: Bool) {
 //        if editingStarted {
 //            // Set a flag stating that we're seeking so the slider doesn't
@@ -170,6 +222,7 @@ struct PlayerContainerView : View {
 //    @State private var seeking = false
     
     private let player: AVPlayer
+    private let slider: UISlider
   
     init?() {
         // ファイル名
@@ -181,11 +234,16 @@ struct PlayerContainerView : View {
             return nil
         }
         player = AVPlayer(url: url)
+        slider = UISlider()
+        slider.minimumValue = 0;
+        slider.maximumValue = 100;
+        slider.value = 0;
     }
   
     var body: some View {
         VStack {
             MoviePlayerView(player: player)
+            SeekBar(player: player, slider: slider)
             MoviePlayerControlsView(player: player)
         }
 //        .onDisappear {
