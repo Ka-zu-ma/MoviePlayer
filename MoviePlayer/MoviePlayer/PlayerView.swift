@@ -26,40 +26,6 @@ struct MoviePlayerView: UIViewRepresentable {
     }
 }
 
-struct SeekBar: UIViewRepresentable {
-    let player: AVPlayer
-    let slider: UISlider
-    
-    func makeUIView(context: Context) -> UIView {
-        return Slider(player: player, slider: slider)
-    }
-    
-    func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<SeekBar>) {
-    }
-}
-
-class Slider: UIView {
-    private let player: AVPlayer
-    private let slider: UISlider
-    
-    init(player: AVPlayer, slider: UISlider){
-        self.player = player
-        self.slider = slider
-        super.init(frame: .zero)
-        self.addSubview(slider)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        // 画面幅いっぱいに広がる
-        slider.frame = bounds
-    }
-}
-
 class MoviewPlayerUIView: UIView {
     private let player: AVPlayer
     private let playerLayer = AVPlayerLayer()
@@ -93,9 +59,9 @@ class MoviewPlayerUIView: UIView {
 }
 
 struct MoviePlayerControlsView : View {
-//    @Binding private(set) var videoPos: Double
-//    @Binding private(set) var videoDuration: Double
 //    @Binding private(set) var seeking: Bool
+    
+    var itemDuration: Double
     
     let player: AVPlayer
     let skipInterval: Double = 15
@@ -169,60 +135,17 @@ struct MoviePlayerControlsView : View {
             self.player.rate = rate
         })
     }
-    
-    //TODO:ここから
-//    func addPeriodicTimeObserver() {
-//        // Notify every half second
-//        let timeScale = CMTimeScale(NSEC_PER_SEC)
-//        let time = CMTime(seconds: 0.5, preferredTimescale: timeScale)
-//
-//        timeObserverToken = player.addPeriodicTimeObserver(forInterval: time,
-//                                                           queue: .main)
-//        { [weak self] time in
-//            // update player transport UI
-//            DispatchQueue.main.async {
-//                print("update timer:\(CMTimeGetSeconds(time))")
-//                // sliderを更新
-//                self?.updateSlider()
-//            }
-//        }
-//    }
-    
-//    private func sliderEditingChanged(editingStarted: Bool) {
-//        if editingStarted {
-//            // Set a flag stating that we're seeking so the slider doesn't
-//            // get updated by the periodic time observer on the player
-//            seeking = true
-//            pausePlayer(true)
-//        }
-//
-//        // Do the seek if we're finished
-//        if !editingStarted {
-//            let targetTime = CMTime(seconds: videoPos * videoDuration,
-//                                    preferredTimescale: 600)
-//            player.seek(to: targetTime) { _ in
-//                // Now the seek is finished, resume normal operation
-//                self.seeking = false
-//                self.pausePlayer(false)
-//            }
-//        }
-//    }
 }
 
-
-
-
-
 struct PlayerContainerView : View {
-//    // The progress through the video, as a percentage (from 0 to 1)
-//    @State private var videoPos: Double = 0
-//    // The duration of the video in seconds
-//    @State private var videoDuration: Double = 0
+
 //    // Whether we're currently interacting with the seek bar or doing a seek
 //    @State private var seeking = false
     
     private let player: AVPlayer
-    private let slider: UISlider
+    var timeObserverToken: Any?
+    var itemDuration: Double = 0    //  動画ファイルの長さを示す秒数
+    @State private var videoPos: Double = 0
   
     init?() {
         // ファイル名
@@ -234,25 +157,47 @@ struct PlayerContainerView : View {
             return nil
         }
         player = AVPlayer(url: url)
-        slider = UISlider()
-        slider.minimumValue = 0;
-        slider.maximumValue = 100;
-        slider.value = 0;
+        
+        let asset = AVAsset(url: url)
+        itemDuration = CMTimeGetSeconds(asset.duration) //  CMTimeを秒に変換
     }
   
     var body: some View {
         VStack {
             MoviePlayerView(player: player)
-            SeekBar(player: player, slider: slider)
-            MoviePlayerControlsView(player: player)
+            
+            Slider(value: self.$videoPos, in: 0...itemDuration, onEditingChanged: sliderEditingChanged).onReceive(Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()){ _ in
+                self.videoPos = Double(CMTimeGetSeconds(self.player.currentTime()))
+            }
+            
+            MoviePlayerControlsView(itemDuration: itemDuration, player: player)
         }
 //        .onDisappear {
 //            // When this View isn't being shown anymore stop the player
 //            self.player.replaceCurrentItem(with: nil)
 //        }
     }
+    
+    private func sliderEditingChanged(editingStarted: Bool) {
+        if editingStarted {
+            // Set a flag stating that we're seeking so the slider doesn't
+            // get updated by the periodic time observer on the player
+//            seeking = true
+//            pausePlayer(true)
+        }
+        
+        // Do the seek if we're finished
+//        if !editingStarted {
+            let targetTime = CMTime(seconds: videoPos,
+                                    preferredTimescale: 600)
+            player.seek(to: targetTime) { _ in
+                // Now the seek is finished, resume normal operation
+//                self.seeking = false
+//                self.pausePlayer(false)
+            }
+//        }
+    }
 }
-
 
 struct PlayerView_Previews: PreviewProvider {
     static var previews: some View {
