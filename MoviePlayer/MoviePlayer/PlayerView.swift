@@ -10,8 +10,64 @@ import SwiftUI
 import AVKit
 
 struct PlayerView: View {
+    
+//    // Whether we're currently interacting with the seek bar or doing a seek
+//    @State private var seeking = false
+    
+    private let player: AVPlayer
+    var timeObserverToken: Any?
+    var itemDuration: Double = 0    //  動画ファイルの長さを示す秒数
+    @State private var videoPos: Double = 0
+  
+    init?() {
+        // ファイル名
+        let fileName = "steinsgateop"
+        let fileExtension = "mp4"
+        
+        guard let url = Bundle.main.url(forResource: fileName, withExtension: fileExtension) else {
+            print("Url is nil")
+            return nil
+        }
+        player = AVPlayer(url: url)
+        
+        let asset = AVAsset(url: url)
+        itemDuration = CMTimeGetSeconds(asset.duration) //  CMTimeを秒に変換
+    }
+  
     var body: some View {
-        return PlayerContainerView()
+        VStack {
+            MoviePlayerView(player: player)
+            
+            Slider(value: self.$videoPos, in: 0...itemDuration, onEditingChanged: sliderEditingChanged).onReceive(Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()){ _ in
+                self.videoPos = Double(CMTimeGetSeconds(self.player.currentTime()))
+            }
+            
+            MoviePlayerControlsView(itemDuration: itemDuration, player: player, videoPos: $videoPos)
+        }
+//        .onDisappear {
+//            // When this View isn't being shown anymore stop the player
+//            self.player.replaceCurrentItem(with: nil)
+//        }
+    }
+    
+    private func sliderEditingChanged(editingStarted: Bool) {
+        if editingStarted {
+            // Set a flag stating that we're seeking so the slider doesn't
+            // get updated by the periodic time observer on the player
+//            seeking = true
+//            pausePlayer(true)
+        }
+        
+        // Do the seek if we're finished
+//        if !editingStarted {
+            let targetTime = CMTime(seconds: videoPos,
+                                    preferredTimescale: 600)
+            player.seek(to: targetTime) { _ in
+                // Now the seek is finished, resume normal operation
+//                self.seeking = false
+//                self.pausePlayer(false)
+            }
+//        }
     }
 }
 
@@ -67,6 +123,7 @@ struct MoviePlayerControlsView : View {
     let skipInterval: Double = 15
     
     @State private var playerPaused = true
+    @Binding private(set) var videoPos: Double
     
     var body: some View {
         HStack {
@@ -133,69 +190,8 @@ struct MoviePlayerControlsView : View {
         player.seek(to: time, completionHandler: {_ in
             // playerをもとのrateに戻す(0より大きいならrateの速度で再生される)
             self.player.rate = rate
+            self.videoPos = Double(CMTimeGetSeconds(time))
         })
-    }
-}
-
-struct PlayerContainerView : View {
-
-//    // Whether we're currently interacting with the seek bar or doing a seek
-//    @State private var seeking = false
-    
-    private let player: AVPlayer
-    var timeObserverToken: Any?
-    var itemDuration: Double = 0    //  動画ファイルの長さを示す秒数
-    @State private var videoPos: Double = 0
-  
-    init?() {
-        // ファイル名
-        let fileName = "steinsgateop"
-        let fileExtension = "mp4"
-        
-        guard let url = Bundle.main.url(forResource: fileName, withExtension: fileExtension) else {
-            print("Url is nil")
-            return nil
-        }
-        player = AVPlayer(url: url)
-        
-        let asset = AVAsset(url: url)
-        itemDuration = CMTimeGetSeconds(asset.duration) //  CMTimeを秒に変換
-    }
-  
-    var body: some View {
-        VStack {
-            MoviePlayerView(player: player)
-            
-            Slider(value: self.$videoPos, in: 0...itemDuration, onEditingChanged: sliderEditingChanged).onReceive(Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()){ _ in
-                self.videoPos = Double(CMTimeGetSeconds(self.player.currentTime()))
-            }
-            
-            MoviePlayerControlsView(itemDuration: itemDuration, player: player)
-        }
-//        .onDisappear {
-//            // When this View isn't being shown anymore stop the player
-//            self.player.replaceCurrentItem(with: nil)
-//        }
-    }
-    
-    private func sliderEditingChanged(editingStarted: Bool) {
-        if editingStarted {
-            // Set a flag stating that we're seeking so the slider doesn't
-            // get updated by the periodic time observer on the player
-//            seeking = true
-//            pausePlayer(true)
-        }
-        
-        // Do the seek if we're finished
-//        if !editingStarted {
-            let targetTime = CMTime(seconds: videoPos,
-                                    preferredTimescale: 600)
-            player.seek(to: targetTime) { _ in
-                // Now the seek is finished, resume normal operation
-//                self.seeking = false
-//                self.pausePlayer(false)
-            }
-//        }
     }
 }
 
