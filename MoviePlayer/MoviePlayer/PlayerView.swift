@@ -16,7 +16,7 @@ struct PlayerView: View {
     
     private let player: AVPlayer
     var timeObserverToken: Any?
-    var itemDuration: Double = 0    //  動画ファイルの長さを示す秒数
+    var videoDuration: Double = 0    //  動画ファイルの長さを示す秒数
     @State private var videoPos: Double = 0
   
     init?() {
@@ -31,18 +31,25 @@ struct PlayerView: View {
         player = AVPlayer(url: url)
         
         let asset = AVAsset(url: url)
-        itemDuration = CMTimeGetSeconds(asset.duration) //  CMTimeを秒に変換
+        videoDuration = CMTimeGetSeconds(asset.duration) //  CMTimeを秒に変換
     }
   
     var body: some View {
+        
         VStack {
             MoviePlayerView(player: player)
             
-            Slider(value: self.$videoPos, in: 0...itemDuration, onEditingChanged: sliderEditingChanged).onReceive(Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()){ _ in
+            Slider(value: self.$videoPos,
+                   in: 0...videoDuration,
+                   onEditingChanged: sliderEditingChanged,
+                   minimumValueLabel: Text(Utility.timeToString(time: videoPos)),
+                   maximumValueLabel: Text(Utility.timeToString(time: videoDuration - videoPos)),
+                   label: { EmptyView() }
+            ).onReceive(Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()){ _ in
                 self.videoPos = Double(CMTimeGetSeconds(self.player.currentTime()))
             }
             
-            MoviePlayerControlsView(itemDuration: itemDuration, player: player, videoPos: $videoPos)
+            MoviePlayerControlsView(itemDuration: videoDuration, player: player, videoPos: $videoPos)
         }
 //        .onDisappear {
 //            // When this View isn't being shown anymore stop the player
