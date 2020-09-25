@@ -22,7 +22,7 @@ struct PlayerView: View {
   
     init?() {
         // ファイル名
-        let fileName = "steinsgateop"
+        let fileName = "plane"
         let fileExtension = "mp4"
         
         guard let url = Bundle.main.url(forResource: fileName, withExtension: fileExtension) else {

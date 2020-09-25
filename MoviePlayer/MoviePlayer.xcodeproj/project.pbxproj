@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9A65E489251DEF2F00891FD7 /* plane.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 9A65E485251DEEFA00891FD7 /* plane.mp4 */; };
 		9ADC6973249CA40100BCE10E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC6972249CA40100BCE10E /* AppDelegate.swift */; };
 		9ADC6975249CA40100BCE10E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC6974249CA40100BCE10E /* SceneDelegate.swift */; };
 		9ADC6977249CA40100BCE10E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC6976249CA40100BCE10E /* ContentView.swift */; };
@@ -16,9 +17,6 @@
 		9ADC698A249CA40400BCE10E /* MoviePlayerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC6989249CA40400BCE10E /* MoviePlayerTests.swift */; };
 		9ADC6995249CA40400BCE10E /* MoviePlayerUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC6994249CA40400BCE10E /* MoviePlayerUITests.swift */; };
 		9ADC69A3249CA71600BCE10E /* PlayerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC69A2249CA71600BCE10E /* PlayerView.swift */; };
-		9ADC69A924B6F66D00BCE10E /* steinsgateop.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 9ADC69A824B6F66D00BCE10E /* steinsgateop.mp4 */; };
-		9ADC69AA24B6F66D00BCE10E /* steinsgateop.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 9ADC69A824B6F66D00BCE10E /* steinsgateop.mp4 */; };
-		9ADC69AB24B6F66D00BCE10E /* steinsgateop.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 9ADC69A824B6F66D00BCE10E /* steinsgateop.mp4 */; };
 		9AF128F4250B70D200AE715A /* Utility.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9AF128F3250B70D200AE715A /* Utility.swift */; };
 /* End PBXBuildFile section */
 
@@ -40,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9A65E485251DEEFA00891FD7 /* plane.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = plane.mp4; sourceTree = "<group>"; };
 		9ADC696F249CA40100BCE10E /* MoviePlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoviePlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ADC6972249CA40100BCE10E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		9ADC6974249CA40100BCE10E /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -55,7 +54,6 @@
 		9ADC6994249CA40400BCE10E /* MoviePlayerUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MoviePlayerUITests.swift; sourceTree = "<group>"; };
 		9ADC6996249CA40400BCE10E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		9ADC69A2249CA71600BCE10E /* PlayerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerView.swift; sourceTree = "<group>"; };
-		9ADC69A824B6F66D00BCE10E /* steinsgateop.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = steinsgateop.mp4; sourceTree = "<group>"; };
 		9AF128F3250B70D200AE715A /* Utility.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utility.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -112,7 +110,7 @@
 				9ADC6976249CA40100BCE10E /* ContentView.swift */,
 				9ADC6978249CA40400BCE10E /* Assets.xcassets */,
 				9ADC697D249CA40400BCE10E /* LaunchScreen.storyboard */,
-				9ADC69A824B6F66D00BCE10E /* steinsgateop.mp4 */,
+				9A65E485251DEEFA00891FD7 /* plane.mp4 */,
 				9ADC6980249CA40400BCE10E /* Info.plist */,
 				9ADC697A249CA40400BCE10E /* Preview Content */,
 				9ADC69A2249CA71600BCE10E /* PlayerView.swift */,
@@ -251,8 +249,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A65E489251DEF2F00891FD7 /* plane.mp4 in Resources */,
 				9ADC697F249CA40400BCE10E /* LaunchScreen.storyboard in Resources */,
-				9ADC69A924B6F66D00BCE10E /* steinsgateop.mp4 in Resources */,
 				9ADC697C249CA40400BCE10E /* Preview Assets.xcassets in Resources */,
 				9ADC6979249CA40400BCE10E /* Assets.xcassets in Resources */,
 			);
@@ -262,7 +260,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9ADC69AA24B6F66D00BCE10E /* steinsgateop.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,7 +267,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9ADC69AB24B6F66D00BCE10E /* steinsgateop.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
