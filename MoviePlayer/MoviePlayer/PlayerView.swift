@@ -18,6 +18,7 @@ struct PlayerView: View {
     var timeObserverToken: Any?
     var videoDuration: Double = 0    //  動画ファイルの長さを示す秒数
     @State private var videoPos: Double = 0
+    @State private var isRepeat = false
   
     init?() {
         // ファイル名
@@ -32,12 +33,18 @@ struct PlayerView: View {
         
         let asset = AVAsset(url: url)
         videoDuration = CMTimeGetSeconds(asset.duration) //  CMTimeを秒に変換
+        
     }
   
     var body: some View {
         
         VStack {
-            MoviePlayerView(player: player)
+            MoviePlayerView(player: player, isRepeat: $isRepeat)
+            
+            // リピートボタン
+            Button(action: toggleRepeat) {
+                Image(systemName: "repeat")
+            }.foregroundColor(isRepeat ? .green : .gray)
             
             Slider(value: self.$videoPos,
                    in: 0...videoDuration,
@@ -76,13 +83,18 @@ struct PlayerView: View {
             }
 //        }
     }
+    
+    private func toggleRepeat(){
+        self.isRepeat.toggle()
+    }
 }
 
 struct MoviePlayerView: UIViewRepresentable {
     let player: AVPlayer
+    @Binding var isRepeat: Bool
     
     func makeUIView(context: Context) -> UIView {
-        return MoviewPlayerUIView(player: player)
+        return MoviewPlayerUIView(player: player, isRepeat: $isRepeat)
     }
     
     func updateUIView(_ uiView: UIView, context: UIViewRepresentableContext<MoviePlayerView>) {
@@ -92,9 +104,11 @@ struct MoviePlayerView: UIViewRepresentable {
 class MoviewPlayerUIView: UIView {
     private let player: AVPlayer
     private let playerLayer = AVPlayerLayer()
+    var isRepeat:Binding<Bool>
     
-    init(player: AVPlayer){
+    init(player: AVPlayer, isRepeat: Binding<Bool>){
         self.player = player
+        self.isRepeat = isRepeat
         //他のアプリが音楽再生中であっても、その音楽は停止しない。スクリーンロックやサイレントにした場合にはこのアプリが再生するサウンドは聞こえなくなる
         do {
             try AVAudioSession.sharedInstance().setCategory(.ambient, options: [])
@@ -109,6 +123,9 @@ class MoviewPlayerUIView: UIView {
 
         playerLayer.player = player
         layer.addSublayer(playerLayer)
+        
+        // 動画の終了時に巻き戻し再生する
+        NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
     }
 
     required init?(coder: NSCoder) {
@@ -118,6 +135,14 @@ class MoviewPlayerUIView: UIView {
     override func layoutSubviews() {
         super.layoutSubviews()
         playerLayer.frame = bounds
+    }
+    
+    @objc private func playerItemDidReachEnd(_ notification: Notification) {
+        if isRepeat.wrappedValue {
+            // 動画を最初に巻き戻す
+            player.currentItem?.seek(to: CMTime.zero, completionHandler: nil)
+            player.play()
+        }
     }
 }
 
@@ -129,7 +154,7 @@ struct MoviePlayerControlsView : View {
     let player: AVPlayer
     let skipInterval: Double = 15
     
-    @State private var playerPaused = true
+    @State private var isPaused = true
     @Binding private(set) var videoPos: Double
     
     var body: some View {
@@ -142,9 +167,9 @@ struct MoviePlayerControlsView : View {
             
             Spacer()
             
-            // 再生/一時停止ボタン
+            // 再生/一時停止ボタンplayerPaused ? "play" : "pause"
             Button(action: togglePlayPause) {
-                Image(systemName: playerPaused ? "play" : "pause")
+                Image(systemName: isPaused ? "play" : "pause")
                     .padding(.trailing, 10)
             }
             
@@ -168,12 +193,12 @@ struct MoviePlayerControlsView : View {
     }
     
     private func togglePlayPause() {
-        pausePlayer(!playerPaused)
+        pausePlayer(!isPaused)
     }
     
     private func pausePlayer(_ pause: Bool) {
-        playerPaused = pause
-        if playerPaused {
+        isPaused = pause
+        if isPaused {
             player.pause()
         }
         else {
