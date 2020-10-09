@@ -11,9 +11,6 @@ import AVKit
 
 struct PlayerView: View {
     
-//    // Whether we're currently interacting with the seek bar or doing a seek
-//    @State private var seeking = false
-    
     private let player: AVPlayer
     var timeObserverToken: Any?
     var videoDuration: Double = 0    //  動画ファイルの長さを示す秒数
@@ -56,12 +53,8 @@ struct PlayerView: View {
                 self.videoPos = Double(CMTimeGetSeconds(self.player.currentTime()))
             }
             
-            MoviePlayerControlsView(itemDuration: videoDuration, player: player, videoPos: $videoPos)
+            MoviePlayerControlsView(videoDuration: videoDuration, player: player, videoPos: $videoPos)
         }
-//        .onDisappear {
-//            // When this View isn't being shown anymore stop the player
-//            self.player.replaceCurrentItem(with: nil)
-//        }
     }
     
     private func sliderEditingChanged(editingStarted: Bool) {
@@ -102,18 +95,26 @@ struct MoviePlayerView: UIViewRepresentable {
 }
 
 class MoviewPlayerUIView: UIView {
-    private let player: AVPlayer
+    private var player: AVPlayer?
     private let playerLayer = AVPlayerLayer()
     var isRepeat:Binding<Bool>
     
     init(player: AVPlayer, isRepeat: Binding<Bool>){
         self.player = player
         self.isRepeat = isRepeat
-        //他のアプリが音楽再生中であっても、その音楽は停止しない。スクリーンロックやサイレントにした場合にはこのアプリが再生するサウンドは聞こえなくなる
+        
+        let session = AVAudioSession.sharedInstance()
         do {
-            try AVAudioSession.sharedInstance().setCategory(.ambient, options: [])
+            try session.setCategory(.playback, options: [])
         } catch {
-            print("Setting category to AVAudioSessionCategoryAmbient failed.")
+            print("Category設定失敗")
+        }
+        
+        // sessionのアクティブ化
+        do {
+            try session.setActive(true)
+        } catch {
+            print("session有効化失敗")
         }
         
         super.init(frame: .zero)
@@ -124,8 +125,11 @@ class MoviewPlayerUIView: UIView {
         playerLayer.player = player
         layer.addSublayer(playerLayer)
         
-        // 動画の終了時に巻き戻し再生する
-        NotificationCenter.default.addObserver(self, selector: #selector(playerItemDidReachEnd(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+        let center = NotificationCenter.default
+        
+        center.addObserver(self, selector: #selector(self.playerItemDidReachEnd), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+        center.addObserver(self, selector: #selector(self.willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
+        center.addObserver(self, selector: #selector(self.didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
     }
 
     required init?(coder: NSCoder) {
@@ -137,19 +141,31 @@ class MoviewPlayerUIView: UIView {
         playerLayer.frame = bounds
     }
     
-    @objc private func playerItemDidReachEnd(_ notification: Notification) {
+    // 動画の終了時に巻き戻し再生する
+    @objc private func playerItemDidReachEnd() {
         if isRepeat.wrappedValue {
             // 動画を最初に巻き戻す
-            player.currentItem?.seek(to: CMTime.zero, completionHandler: nil)
-            player.play()
+            player?.currentItem?.seek(to: CMTime.zero, completionHandler: nil)
+            player?.play()
         }
+    }
+    
+    // フォアグラウンド移行時に呼び出されます
+    @objc func willEnterForeground() {
+        // 動画再生再開
+        playerLayer.player = player
+    }
+    
+    // バックグラウンド移行時に呼び出されます
+    @objc func didEnterBackground() {
+        // バッググラウンドでオーディオ再生
+        playerLayer.player = nil
     }
 }
 
 struct MoviePlayerControlsView : View {
-//    @Binding private(set) var seeking: Bool
-    
-    var itemDuration: Double
+
+    var videoDuration: Double
     
     let player: AVPlayer
     let skipInterval: Double = 15
@@ -167,7 +183,7 @@ struct MoviePlayerControlsView : View {
             
             Spacer()
             
-            // 再生/一時停止ボタンplayerPaused ? "play" : "pause"
+            // 再生/一時停止ボタン
             Button(action: togglePlayPause) {
                 Image(systemName: isPaused ? "play" : "pause")
                     .padding(.trailing, 10)
@@ -179,13 +195,6 @@ struct MoviePlayerControlsView : View {
             Button(action: { self.skip(interval: self.skipInterval) }) {
                 Text("早送り")
             }
-            
-            // Current video time
-//            Text("\(Utility.formatSecondsToHMS(videoPos * videoDuration))")
-            // Slider for seeking / showing video progress
-//            Slider(value: $videoPos, in: 0...1, onEditingChanged: sliderEditingChanged)
-            // Video duration
-//            Text("\(Utility.formatSecondsToHMS(videoDuration))")
         }
         .padding(.leading, 10)
         .padding(.trailing, 10)
@@ -209,7 +218,15 @@ struct MoviePlayerControlsView : View {
     private func skip(interval: Double) {
         let timeScale = CMTimeScale(NSEC_PER_SEC)
         let rhs = CMTimeMakeWithSeconds(interval, preferredTimescale: timeScale)
-        let time = CMTimeAdd(player.currentTime(), rhs)
+        var time = CMTimeAdd(player.currentTime(), rhs)
+        
+        if Double(CMTimeGetSeconds(time)) <= 0 {
+            // シークバーの最小時間が0:00未満にならないようにする
+            time = CMTime.zero
+        } else if videoDuration <= Double(CMTimeGetSeconds(time)) {
+            // シークバーの最大時間が動画時間を超えないようにする
+            time = CMTimeMakeWithSeconds(videoDuration, preferredTimescale: 100)
+        }
         
         changePosition(time: time)
     }

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9A42874D252C6E6E003722F1 /* strings.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 9A42874C252C6E6E003722F1 /* strings.mp3 */; };
 		9A65E489251DEF2F00891FD7 /* plane.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 9A65E485251DEEFA00891FD7 /* plane.mp4 */; };
 		9ADC6973249CA40100BCE10E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC6972249CA40100BCE10E /* AppDelegate.swift */; };
 		9ADC6975249CA40100BCE10E /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9ADC6974249CA40100BCE10E /* SceneDelegate.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		9A42874C252C6E6E003722F1 /* strings.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = strings.mp3; sourceTree = "<group>"; };
 		9A65E485251DEEFA00891FD7 /* plane.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = plane.mp4; sourceTree = "<group>"; };
 		9ADC696F249CA40100BCE10E /* MoviePlayer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MoviePlayer.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9ADC6972249CA40100BCE10E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -111,6 +113,7 @@
 				9ADC6978249CA40400BCE10E /* Assets.xcassets */,
 				9ADC697D249CA40400BCE10E /* LaunchScreen.storyboard */,
 				9A65E485251DEEFA00891FD7 /* plane.mp4 */,
+				9A42874C252C6E6E003722F1 /* strings.mp3 */,
 				9ADC6980249CA40400BCE10E /* Info.plist */,
 				9ADC697A249CA40400BCE10E /* Preview Content */,
 				9ADC69A2249CA71600BCE10E /* PlayerView.swift */,
@@ -208,7 +211,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1150;
-				LastUpgradeCheck = 1150;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = "宮崎数磨";
 				TargetAttributes = {
 					9ADC696E249CA40100BCE10E = {
@@ -249,6 +252,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9A42874D252C6E6E003722F1 /* strings.mp3 in Resources */,
 				9A65E489251DEF2F00891FD7 /* plane.mp4 in Resources */,
 				9ADC697F249CA40400BCE10E /* LaunchScreen.storyboard in Resources */,
 				9ADC697C249CA40400BCE10E /* Preview Assets.xcassets in Resources */,
@@ -354,6 +358,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -414,6 +419,7 @@
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
