@@ -8,6 +8,7 @@
 
 import SwiftUI
 import AVKit
+import MediaPlayer
 
 struct PlayerView: View {
     
@@ -19,8 +20,8 @@ struct PlayerView: View {
   
     init?() {
         // ファイル名
-        let fileName = "plane"
-        let fileExtension = "mp4"
+        let fileName = "strings"
+        let fileExtension = "mp3"
         
         guard let url = Bundle.main.url(forResource: fileName, withExtension: fileExtension) else {
             print("Url is nil")
@@ -130,6 +131,8 @@ class MoviewPlayerUIView: UIView {
         center.addObserver(self, selector: #selector(self.playerItemDidReachEnd), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
         center.addObserver(self, selector: #selector(self.willEnterForeground), name: UIApplication.willEnterForegroundNotification, object: nil)
         center.addObserver(self, selector: #selector(self.didEnterBackground), name: UIApplication.didEnterBackgroundNotification, object: nil)
+        
+        addRemoteCommandEvent()
     }
 
     required init?(coder: NSCoder) {
@@ -160,6 +163,37 @@ class MoviewPlayerUIView: UIView {
     @objc func didEnterBackground() {
         // バッググラウンドでオーディオ再生
         playerLayer.player = nil
+    }
+    
+    // MARK: Remote Command Event
+    func addRemoteCommandEvent() {
+        
+        let commandCenter = MPRemoteCommandCenter.shared()
+        commandCenter.togglePlayPauseCommand.addTarget{ [unowned self] commandEvent -> MPRemoteCommandHandlerStatus in
+            self.remoteTogglePlayPause(commandEvent)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        commandCenter.playCommand.addTarget{ [unowned self] commandEvent -> MPRemoteCommandHandlerStatus in
+            self.remotePlay(commandEvent)
+            return MPRemoteCommandHandlerStatus.success
+        }
+        commandCenter.pauseCommand.addTarget{ [unowned self] commandEvent -> MPRemoteCommandHandlerStatus in
+            self.remotePause(commandEvent)
+            return MPRemoteCommandHandlerStatus.success
+        }
+    }
+    
+    func remoteTogglePlayPause(_ event: MPRemoteCommandEvent) {
+            // イヤホンのセンターボタンを押した時の処理
+            // (略)
+        }
+        
+    func remotePlay(_ event: MPRemoteCommandEvent) {
+        player?.play()
+    }
+    
+    func remotePause(_ event: MPRemoteCommandEvent) {
+        player?.pause()
     }
 }
 
