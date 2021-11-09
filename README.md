@@ -1,2 +1,2 @@
 # MoviePlayer
-AVplayerを使った動画再生アプリ
+SwiftUIを使用して作った動画再生アプリ
